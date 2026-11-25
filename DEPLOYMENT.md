@@ -111,4 +111,4 @@ $ python check_production_ready.py --public-url "$BASE"
 
 - [Deployment dashboard](screenshots/dashboard.png)
 - [Service running](screenshots/running.png)
-- [Test results](screenshots/test.png)
+- [Test results](screenshots/test.png): output thật của 4 lệnh tự kiểm chạy trong Ubuntu lúc 18:40 ngày 2026-11-25 (key đọc từ file, không hiện), hiển thị trong khung terminal bằng Playwright

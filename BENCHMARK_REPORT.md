@@ -99,10 +99,13 @@ Unit test alert rules: `promtool test rules /p/alert_rules_test.yml` → **SUCCE
 
 ### 4.1 Screenshot
 
-- [ ] Dashboard Grafana khi đang có tải — [`screenshots/grafana-dashboard.png`](screenshots/grafana-dashboard.png)
-- [ ] Một trace chậm trong Jaeger — [`screenshots/jaeger-slow-trace.png`](screenshots/jaeger-slow-trace.png)
-- [ ] Một trace lỗi trong Jaeger (có event `exception`) — [`screenshots/jaeger-error-trace.png`](screenshots/jaeger-error-trace.png)
-- [ ] Trang Alerts của Prometheus với ≥ 2 alert **firing** — [`screenshots/prometheus-alert-firing.png`](screenshots/prometheus-alert-firing.png)
+Chụp bằng Chromium headless (Playwright) trong container nối vào network của stack, lúc có tải nền Locust 10 user. Ảnh Prometheus chụp khi đang chạy đồng thời thí nghiệm A (`MOCK_ERROR_RATE=0.2`) và D (pause 1 instance).
+
+
+- [x] Dashboard Grafana khi đang có tải — [`screenshots/grafana-dashboard.png`](screenshots/grafana-dashboard.png)
+- [x] Một trace chậm trong Jaeger — [`screenshots/jaeger-slow-trace.png`](screenshots/jaeger-slow-trace.png)
+- [x] Một trace lỗi trong Jaeger (có event `exception`) — [`screenshots/jaeger-error-trace.png`](screenshots/jaeger-error-trace.png)
+- [x] Trang Alerts của Prometheus với ≥ 2 alert **firing** — [`screenshots/prometheus-alert-firing.png`](screenshots/prometheus-alert-firing.png)
 
 **Exercise 7.4 — đọc dashboard:**
 - **Khoảng cách avg ↔ p95/p99:** panel latency cho thấy avg ~238 ms, p50 ~190 ms, p95 ~240 ms nhưng p99 ~1.7 s. ~3% request bị mock LLM làm chậm +1.5 s chỉ kéo avg lên vài chục ms nhưng quyết định p99 → đúng như 2.2, phải nhìn percentile.
