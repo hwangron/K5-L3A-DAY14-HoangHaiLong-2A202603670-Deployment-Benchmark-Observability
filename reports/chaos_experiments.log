@@ -1,0 +1,39 @@
+# Part 7 — log thô thí nghiệm phá hệ thống (chaos.py, tải nền Locust 10 user). Giờ local GMT+7.
+16:46:59 ===== A: {'MOCK_ERROR_RATE': '0.2'} → chờ AgentHighErrorRate
+16:48:24 không còn alert nào pending/firing
+16:48:24   [trước] {"error_rate": 0.0057, "p95_s": 0.2941, "avg_s": 0.2383, "cost_usd_per_h": 1.7415, "tokens_per_s": 763.6962, "rps": 6.3276, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}"]}
+16:48:26   đã áp dụng cấu hình (t0)
+16:48:56   AgentHighErrorRate → pending sau 32s
+16:49:56   AgentHighErrorRate → FIRING sau 92s (activeAt=2026-11-25T09:48:47.401817116Z, value=2.1999996259502425e-01)
+16:50:16   [trong lúc lỗi] {"error_rate": 0.1788, "p95_s": 0.2874, "avg_s": 0.1947, "cost_usd_per_h": 0.5605, "tokens_per_s": 654.5874, "rps": 6.5095, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}"]}
+16:50:18   đã trả cấu hình về mặc định
+16:50:18 ===== B: {'MOCK_SLOW_RATE': '0.3'} → chờ AgentHighLatencyP95
+16:51:08 không còn alert nào pending/firing
+16:51:08   [trước] {"error_rate": 0.0235, "p95_s": 0.2966, "avg_s": 0.2471, "cost_usd_per_h": 0.656, "tokens_per_s": 534.6791, "rps": 4.5058, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}"]}
+16:51:10   đã áp dụng cấu hình (t0)
+16:51:40   AgentHighLatencyP95 → pending sau 32s
+16:53:40   AgentHighLatencyP95 → FIRING sau 152s (activeAt=2026-11-25T09:51:32.401817116Z, value=1.9165662650602409e+00)
+16:54:00   [trong lúc lỗi] {"error_rate": 0.0113, "p95_s": 1.9236, "avg_s": 0.6795, "cost_usd_per_h": 0.63, "tokens_per_s": 572.7093, "rps": 4.8367, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}"]}
+16:54:01   đã trả cấu hình về mặc định
+16:54:01 ===== D: docker pause 1 instance → chờ AgentInstanceDown
+16:55:01 không còn alert nào pending/firing
+16:55:01   [trước] {"error_rate": 0.0077, "p95_s": 0.2861, "avg_s": 0.2038, "cost_usd_per_h": 0.6184, "tokens_per_s": 588.5969, "rps": 4.9214, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}"]}
+16:55:02   docker pause k5-day14-observability-agent-1 (t0)
+16:55:17   AgentInstanceDown → pending sau 15s
+16:55:47   AgentInstanceDown → FIRING sau 45s (activeAt=2026-11-25T09:55:07.401817116Z, value=0e+00)
+16:55:57   [trong lúc pause] {"error_rate": 0.0, "p95_s": 0.2929, "avg_s": 0.2312, "cost_usd_per_h": 0.6176, "tokens_per_s": 533.0473, "rps": 4.4002, "up": 1.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}"]}
+16:55:57   docker unpause k5-day14-observability-agent-1
+16:55:57 ===== E: AGENT_VERSION=v1 → theo dõi 4 phút, mong đợi KHÔNG có alert
+16:56:07 không còn alert nào pending/firing
+16:56:07   [trước (v2)] {"error_rate": 0.0033, "p95_s": 0.292, "avg_s": 0.2283, "cost_usd_per_h": 0.6287, "tokens_per_s": 655.2891, "rps": 5.4391, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v2\"}"]}
+17:00:08   [sau 4 phút (v1)] {"error_rate": 0.0084, "p95_s": 0.198, "avg_s": 0.2066, "cost_usd_per_h": 0.4298, "tokens_per_s": 363.0711, "rps": 6.5276, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v1\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v1\"}"]}
+17:00:08   alert firing trong 4 phút: KHÔNG CÓ
+17:00:10 ===== C: {'LLM_MODEL': 'mock-llm-large'} → chờ LLMCostBurnRateHigh
+17:00:10 không còn alert nào pending/firing
+17:00:10   [trước] {"error_rate": 0.0084, "p95_s": 0.198, "avg_s": 0.2066, "cost_usd_per_h": 0.4307, "tokens_per_s": 363.0711, "rps": 6.5276, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v1\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-small\", \"version\": \"v1\"}"]}
+17:00:14   đã áp dụng cấu hình (t0)
+17:01:19   LLMCostBurnRateHigh → pending sau 69s
+17:03:19   LLMCostBurnRateHigh → FIRING sau 189s (activeAt=2026-11-25T10:01:12.571501534Z, value=6.65525848820259e+00)
+17:03:39   [trong lúc lỗi] {"error_rate": 0.0105, "p95_s": 0.6982, "avg_s": 0.4888, "cost_usd_per_h": 7.6402, "tokens_per_s": 620.9373, "rps": 5.2184, "up": 2.0, "targets": 2.0, "versions": ["{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.7:8000\", \"job\": \"agent\", \"model\": \"mock-llm-large\", \"version\": \"v2\"}", "{\"__name__\": \"agent_info\", \"instance\": \"172.19.0.9:8000\", \"job\": \"agent\", \"model\": \"mock-llm-large\", \"version\": \"v2\"}"]}
+17:03:41   đã trả cấu hình về mặc định
+17:03:41 RESULTS {"A": [31.957448959350586, 92.08247423171997], "B": [32.01419234275818, 152.20631623268127], "D": [15.096691846847534, 45.12983179092407], "E": [], "C": [69.13366675376892, 189.26672101020813]}

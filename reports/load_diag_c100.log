@@ -1,0 +1,15 @@
+# Part 7 — chẩn đoán concurrency 100 (container python:3.11-slim, 4 vCPU)
+4
+  Requests     : 600  (concurrency=75)
+  Throughput   : 52.01 req/s
+                 p50=513.1  p90=3295.0  p95=4076.1  p99=5356.0
+  Requests     : 600  (concurrency=100)
+  Throughput   : 47.58 req/s
+                 p50=1256.9  p90=4754.3  p95=5240.0  p99=5568.1
+--- 100 trên 2 client song song (mỗi client 50)
+  Throughput   : 102.42 req/s
+                 p50=207.3  p90=324.2  p95=376.2  p99=1720.9
+  Throughput   : 101.1 req/s
+                 p50=208.1  p90=342.3  p95=374.3  p99=1721.4
+
+[exited with code 0]
