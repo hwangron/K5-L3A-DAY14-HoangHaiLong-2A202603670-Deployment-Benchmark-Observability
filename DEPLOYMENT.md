@@ -2,7 +2,7 @@
 
 ## Public URL
 
-⏳ `https://<điền-domain>.up.railway.app` — điền sau khi chạy `railway domain`
+https://k5-l3a-day14-hoanghailong-2a202603670-deployment-production.up.railway.app
 
 ## Platform
 
@@ -17,7 +17,7 @@ Railway. Deploy thư mục `06-lab-complete/` (agent Part 6) bằng Dockerfile, 
 Đặt biến trước khi test (key không ghi vào file):
 
 ```bash
-export BASE="https://<điền-domain>.up.railway.app"
+export BASE="https://k5-l3a-day14-hoanghailong-2a202603670-deployment-production.up.railway.app"
 export AGENT_API_KEY="<key đã đặt trên Railway>"
 ```
 
@@ -53,13 +53,43 @@ for i in $(seq 1 15); do
   curl -sS -o /dev/null -w "Request $i: %{http_code}\n" -X POST "$BASE/ask" \
     -H 'Content-Type: application/json' -H "X-API-Key: $AGENT_API_KEY" -d '{"question":"test"}'
 done
-# Request 1–10: 200, từ request 11: 429 (có header Retry-After)
+# Tối đa 10 request có key / 60 giây, vượt → 429 (có header Retry-After)
 ```
 
 ### Kết quả 4 lệnh tự kiểm (CP6)
 
 ```text
-⏳ dán output vào đây
+$ curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/health"
+200
+$ curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/ready"
+200
+$ curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -d '{"question":"Hello"}'
+401
+$ curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -H "X-API-Key: $AGENT_API_KEY" -d '{"question":"Hello"}'
+200
+--- body
+{"status":"ok","uptime_s":45.6}
+{"status":"ready","redis":true}
+{"question":"What is deployment?","answer":"Deployment là quá trình đưa code từ máy bạn lên server để người khác dùng được.","usage":{"input_tokens":4,"output_tokens":19,"cost_usd":1.2e-05}}
+--- rate limit: 15 request liên tiếp (2 request có key ở trên đã dùng 2 lượt trong cùng phút)
+Request 1: 200
+Request 2: 200
+Request 3: 200
+Request 4: 200
+Request 5: 200
+Request 6: 200
+Request 7: 200
+Request 8: 200
+Request 9: 429
+Request 10: 429
+Request 11: 429
+Request 12: 429
+Request 13: 429
+Request 14: 429
+Request 15: 429
+
+$ python check_production_ready.py --public-url "$BASE"
+✅ Public URL: GET https://k5-l3a-day14-hoanghailong-2a202603670-deployment-production.up.railway.app/health → 200
 ```
 
 ## Environment Variables Set

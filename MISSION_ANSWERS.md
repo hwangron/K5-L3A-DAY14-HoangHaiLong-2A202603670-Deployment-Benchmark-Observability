@@ -148,7 +148,10 @@ $ curl -X POST http://localhost/ask -H "Content-Type: application/json" -d '{"qu
 
 ### Exercise 3.1: Railway (deploy agent Part 6 trong `06-lab-complete/`)
 
-- URL: **⏳ CHƯA DEPLOY — điền URL sau khi `railway up` + `railway domain`**
+- URL: **https://k5-l3a-day14-hoanghailong-2a202603670-deployment-production.up.railway.app**
+- Deploy: service của repo trong project Railway `renewed-determination`, thêm service Redis, biến môi trường đặt bằng `railway variable set` (`AGENT_API_KEY` qua `--stdin`), `railway up` thư mục `06-lab-complete/` (Dockerfile + `railway.toml`), `railway domain`.
+- Kết quả 4 lệnh tự kiểm CP6: `/health` **200**, `/ready` **200**, `/ask` không key **401**, `/ask` có key **200**; vượt 10 request/phút → **429**.
+- Sự cố khi deploy: `railway up` chạy trực tiếp trên ổ Windows (`/mnt/d`, WSL) gửi lên file toàn byte `\x00` (build báo `exclude-patterns contains non-printable ASCII`, rồi `Invalid requirement: '\x00\x00…'`). Chép `06-lab-complete/` sang filesystem Linux (`~/k5-deploy`) rồi `railway up ~/k5-deploy --path-as-root` thì build và healthcheck thành công.
 - Chi tiết lệnh test, biến môi trường, ảnh chụp: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ### Exercise 3.2: So sánh `railway.toml` và `render.yaml`
@@ -448,3 +451,4 @@ Lần chạy đầu tiên trong Ubuntu báo `4/12` vì WSL Integration của Doc
 | 2 | Claude Code: viết code Part 6 (các TODO trong `06-lab-complete/`) | `config.py`, `log.py` (JsonFormatter), `auth.py`, `redis_client.py`, `rate_limiter.py` (sorted set + MULTI/EXEC), `cost_guard.py` (INCRBYFLOAT daily/monthly), `main.py` (lifespan, middleware log, exception handler), Dockerfile multi-stage, compose, `.dockerignore`, `railway.toml`, `render.yaml` | Chạy `check_production_ready.py` (static, runtime trong Linux, Docker); đọc lại từng file để giải thích được |
 | 3 | Claude Code: chạy Part 1, 2, 4, 5 và soạn câu trả lời | Output thật của các lệnh + câu trả lời; phát hiện 502 khi Nginx khởi động trước agent, lỗi log JSON của Part 1 production, lỗi `budget_remaining_usd` | Đối chiếu từng con số với output lệnh |
 | 4 | Claude Code: chạy Part 7 (load test, eval, sửa KNOWLEDGE_BASE, observability stack, chaos) | Report JSON/CSV, 2 entry KB mới (JWT, HPA), fix `PYTHONUSERBASE` trong Dockerfile Part 7, phát hiện `docker compose run` reset số replica (thêm `--no-deps`) | Chạy lại eval (23/23), kiểm tra số instance trước/sau mỗi lần Locust |
+| 5 | Claude Code: deploy lên Railway (project `renewed-determination` có sẵn, gói Free không cho tạo project mới) | Thêm Redis, đặt biến môi trường, chẩn đoán lỗi build do `railway up` từ `/mnt/d` gửi file toàn byte 0, deploy từ bản sao trên filesystem Linux | Chạy 4 lệnh tự kiểm CP6 (200/200/401/200), vòng lặp rate limit ra 429, `check_production_ready.py --public-url` ✅ |

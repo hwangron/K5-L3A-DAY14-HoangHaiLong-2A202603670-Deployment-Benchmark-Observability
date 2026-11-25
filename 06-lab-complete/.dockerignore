@@ -1,4 +1,7 @@
-# Secrets — không bao giờ đưa vào image
+# NOTE: keep this file ASCII-only. Railway's builder sends these patterns in an
+# HTTP header and rejects non-ASCII characters (even inside comments).
+
+# Secrets - never copy into the image
 .env
 .env.*
 !.env.example
@@ -21,7 +24,7 @@ env/
 .idea/
 .DS_Store
 
-# Không cần lúc chạy
+# Not needed at runtime
 *.md
 benchmark-observability/
 check_production_ready.py
