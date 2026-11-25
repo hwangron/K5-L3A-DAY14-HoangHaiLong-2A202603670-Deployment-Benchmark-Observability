@@ -134,31 +134,31 @@ Unit test alert rules: `promtool test rules /p/alert_rules_test.yml` → **SUCCE
 
 ### 4.3 Debug bằng trace
 
-Trace chậm nhất trong 1 giờ chạy (tìm qua Jaeger API `/api/v3/traces`, `duration_min=1.5s`, 892 trace > 1.5 s):
+Trace chậm nhất (chụp ở `screenshots/jaeger-slow-trace.png`), tìm qua Jaeger API `/api/v3/traces` với `duration_min=1.5s` trong 10 phút tải nền 10 user (29 trace > 1.5 s). Lần chạy đầu (1 giờ, 892 trace > 1.5 s) có trace chậm nhất 1876.5 ms với cùng kết luận, nhưng Jaeger lưu trace trong RAM nên mất khi Docker Desktop khởi động lại; trace dưới đây là của stack đang chạy lúc chụp.
 
-- `trace_id`: `893a62fcd80b33f0ae3b882a9732c2e1`
-- Tổng thời gian: **1876.5 ms** (`POST /ask`)
-- Span chiếm nhiều thời gian nhất: **`chat mock-llm-small` (1692.1 ms, 90.2%)** — `gen_ai.request.model=mock-llm-small`, `input_tokens=81`, `output_tokens=46`. Các span khác: `agent.run` 1782.0 ms (95.0%, span cha bao LLM), `agent.retrieve_context` 89.6 ms (4.8%). → Chậm nằm ở LLM upstream (request rơi vào nhóm `MOCK_SLOW_RATE`), không phải code của agent; muốn cải thiện phải đặt timeout/retry cho LLM, cache, hoặc đổi model/nhà cung cấp.
+- `trace_id`: `d14598bdfd45e7802a815de1f5f1e968`
+- Tổng thời gian: **1720.1 ms** (`POST /ask`)
+- Span chiếm nhiều thời gian nhất: **`chat mock-llm-small` (1693.7 ms, 98.5%)**. Thuộc tính: `gen_ai.request.model=mock-llm-small`, `gen_ai.usage.input_tokens=72`, `gen_ai.usage.output_tokens=40`. Các span khác: `agent.run` 1718.2 ms (99.9%, span cha bao LLM), `agent.retrieve_context` 24.3 ms (1.4%). Như vậy chậm nằm ở LLM upstream (request rơi vào nhóm `MOCK_SLOW_RATE`), không phải code của agent. Muốn cải thiện phải đặt timeout/retry cho LLM, cache, hoặc đổi model/nhà cung cấp.
 
 ```text
-POST /ask                    1876.5 ms  100.0%
-└── agent.run                1782.0 ms   95.0%
-    ├── agent.retrieve_context  89.6 ms    4.8%
-    └── chat mock-llm-small   1692.1 ms   90.2%   ← span chậm nhất
+POST /ask                       1720.1 ms  100.0%
+└── agent.run                   1718.2 ms   99.9%
+    ├── agent.retrieve_context    24.3 ms    1.4%
+    └── chat mock-llm-small     1693.7 ms   98.5%   ← span chậm nhất
 ```
 
 - Dòng log tương ứng (grep theo `trace_id` trong `docker compose -p k5-day14-observability logs agent`):
 
 ```json
-{"ts": "2026-11-25T09:37:52.021509+00:00", "level": "INFO", "service": "observable-agent", "instance": "5949f38237d2", "event": "llm_call", "trace_id": "893a62fcd80b33f0ae3b882a9732c2e1", "span_id": "408444a2da1a78d4", "request_id": "b43c9b349747", "model": "mock-llm-small", "agent_version": "v2", "input_tokens": 81, "output_tokens": 46, "cost_usd": 4e-05, "llm_ms": 1692.5}
-{"ts": "2026-11-25T09:37:52.022223+00:00", "level": "INFO", "service": "observable-agent", "instance": "5949f38237d2", "event": "http_request", "trace_id": "893a62fcd80b33f0ae3b882a9732c2e1", "span_id": "408444a2da1a78d4", "request_id": "b43c9b349747", "method": "POST", "route": "/ask", "status": 200, "ms": 1875.1}
+{"ts": "2026-11-25T10:37:28.407557+00:00", "level": "INFO", "service": "observable-agent", "instance": "2c1d18968b1e", "event": "llm_call", "trace_id": "d14598bdfd45e7802a815de1f5f1e968", "span_id": "9d13cd61da46713e", "request_id": "13632c8d6393", "model": "mock-llm-small", "agent_version": "v2", "input_tokens": 72, "output_tokens": 40, "cost_usd": 3.5e-05, "llm_ms": 1692.9}
+{"ts": "2026-11-25T10:37:28.407905+00:00", "level": "INFO", "service": "observable-agent", "instance": "2c1d18968b1e", "event": "http_request", "trace_id": "d14598bdfd45e7802a815de1f5f1e968", "span_id": "9d13cd61da46713e", "request_id": "13632c8d6393", "method": "POST", "route": "/ask", "status": 200, "ms": 1719.6}
 ```
 
-Trace lỗi: `trace_id` `a12314ec93049153ee2cfac0e7ba88cb` (115.9 ms). Span `chat mock-llm-small` và `agent.run` có status ERROR, event `exception` với `exception.type = utils.mock_llm.LLMError`, `exception.message = "Upstream LLM error: 503 Service Unavailable (mock)"`. Log tương ứng:
+Trace lỗi (chụp ở `screenshots/jaeger-error-trace.png`): `trace_id` `811dee90b8ce210c2ad9da7b12e35aa0` (107.5 ms). Span `chat mock-llm-small` và `agent.run` có status ERROR, event `exception` với `exception.type = utils.mock_llm.LLMError`, `exception.message = "Upstream LLM error: 503 Service Unavailable (mock)"`. Log tương ứng:
 
 ```json
-{"ts": "2026-11-25T09:44:17.756784+00:00", "level": "INFO", "service": "observable-agent", "instance": "4d3e21bf7d3b", "event": "llm_error", "trace_id": "a12314ec93049153ee2cfac0e7ba88cb", "span_id": "d58709111e0cb763", "request_id": "ae71ad65e539", "error": "Upstream LLM error: 503 Service Unavailable (mock)"}
-{"ts": "2026-11-25T09:44:17.757122+00:00", "level": "INFO", "service": "observable-agent", "instance": "4d3e21bf7d3b", "event": "http_request", "trace_id": "a12314ec93049153ee2cfac0e7ba88cb", "span_id": "d58709111e0cb763", "request_id": "ae71ad65e539", "method": "POST", "route": "/ask", "status": 503, "ms": 115.2}
+{"ts": "2026-11-25T10:38:41.456027+00:00", "level": "INFO", "service": "observable-agent", "instance": "fca8db5e6084", "event": "llm_error", "trace_id": "811dee90b8ce210c2ad9da7b12e35aa0", "span_id": "3a0f38df5ae2802e", "request_id": "007af659ccf6", "error": "Upstream LLM error: 503 Service Unavailable (mock)"}
+{"ts": "2026-11-25T10:38:41.456280+00:00", "level": "INFO", "service": "observable-agent", "instance": "fca8db5e6084", "event": "http_request", "trace_id": "811dee90b8ce210c2ad9da7b12e35aa0", "span_id": "3a0f38df5ae2802e", "request_id": "007af659ccf6", "method": "POST", "route": "/ask", "status": 503, "ms": 107.1}
 ```
 
 (Nhận xét nhỏ: dòng `llm_error` có `"level": "INFO"` — nên log ở mức ERROR để lọc/alert theo level.)
